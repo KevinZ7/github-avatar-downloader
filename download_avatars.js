@@ -1,26 +1,24 @@
+//variables used to store command line arguments
 var owner = process.argv[2];
 var name = process.argv[3];
 
-
+//import all of the needed modules
 var request = require('request');
 var secret = require('./secret.js');
 var fs = require('fs');
 
 console.log('Welcome to the GitHub Avatar Downloader!');
 
-var host = 'https://api.github.com/repos/';
-var contributor = '/contributors';
-var accessToken = '?access_token=c5e9ef6ef935fe7ed7f427545358b973a62ab2d2';
-
-
-
+//main function that takes in the repoOwner, repoName, and a callback function
 function getRepoContributors(repoOwner, repoName, cb){
 
+//if the command line inputs are not given, give error messagea and return error
   if(repoOwner === undefined || repoName === undefined){
     console.log('Sorry, invalid RepoName or RepoOwner');
     return false;
   }
 
+//opjects containing the information regarding the site that we are looking up to
   var options = {
     json: true,
     url: "https://api.github.com/repos/" + repoOwner + "/" + repoName + "/contributors",
@@ -34,6 +32,7 @@ function getRepoContributors(repoOwner, repoName, cb){
 
 }
 
+//callback function that retrives the url and filepath of each contributor
 function callback(err,response,result){
    if(err){
      throw err;
@@ -46,6 +45,7 @@ function callback(err,response,result){
    });
 }
 
+//download function that writes the url to file path
 function downloadImageByURL(url,filePath){
   request(url).pipe(fs.createWriteStream(filePath));
 }

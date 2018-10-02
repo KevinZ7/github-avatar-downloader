@@ -1,3 +1,7 @@
+var owner = process.argv[2];
+var name = process.argv[3];
+
+
 var request = require('request');
 var secret = require('./secret.js');
 var fs = require('fs');
@@ -12,7 +16,13 @@ var accessToken = '?access_token=c5e9ef6ef935fe7ed7f427545358b973a62ab2d2';
 
 function getRepoContributors(repoOwner, repoName, cb){
 
+  if(repoOwner === undefined || repoName === undefined){
+    console.log('Sorry, invalid RepoName or RepoOwner');
+    return false;
+  }
+
   var options = {
+    json: true,
     url: "https://api.github.com/repos/" + repoOwner + "/" + repoName + "/contributors",
     headers: {
       'User-Agent': 'request',
@@ -20,18 +30,13 @@ function getRepoContributors(repoOwner, repoName, cb){
     }
   };
 
-  request(options, function(err, response, body){
-    var parsed = JSON.parse(body);
-    cb(err, parsed);
-  });
+  request(options,cb);
 
 }
 
-
-
-getRepoContributors("jquery", "jquery", function(err, result) {
+function callback(err,response,result){
    if(err){
-    throw err;
+     throw err;
    }
 
    result.forEach(function(element){
@@ -39,9 +44,13 @@ getRepoContributors("jquery", "jquery", function(err, result) {
     var filePath = 'avatars/' + element.login + '.jpg';
     downloadImageByURL(url,filePath);
    });
-});
+}
 
-function downloadImageByURL(url, filePath) {
+function downloadImageByURL(url,filePath){
   request(url).pipe(fs.createWriteStream(filePath));
 }
+
+
+
+getRepoContributors(owner, name, callback);
 
